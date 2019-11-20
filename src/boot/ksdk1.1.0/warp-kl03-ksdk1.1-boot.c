@@ -55,7 +55,7 @@
 #include "SEGGER_RTT.h"
 #include "warp.h"
 
-//#define WARP_FRDMKL03
+#define WARP_FRDMKL03
 
 /*
 *	Comment out the header file to disable devices
@@ -69,6 +69,7 @@
 #	include "devBME680.h"
 #	include "devCCS811.h"
 #	include "devAMG8834.h"
+#	include "devSSD1331.h"
 //#include "devTCS34725.h"
 //#include "devSI4705.h"
 //#include "devSI7021.h"
@@ -212,7 +213,6 @@ void					powerupAllSensors(void);
 uint8_t					readHexByte(void);
 int					read4digits(void);
 void					printAllSensors(bool printHeadersAndCalibration, bool hexModeFlag, int menuDelayBetweenEachRun, int i2cPullupValue);
-
 
 /*
  *	TODO: change the following to take byte arrays
@@ -1013,6 +1013,7 @@ checkSum(uint8_t *  pointer, uint16_t length) /*	Adapted from https://stackoverf
 int
 main(void)
 {
+
 	uint8_t					key;
 	WarpSensorDevice			menuTargetSensor = kWarpSensorBMX055accel;
 	volatile WarpI2CDeviceState *		menuI2cDevice = NULL;
@@ -1235,7 +1236,7 @@ main(void)
 #endif
 
 #ifdef WARP_BUILD_ENABLE_DEVMMA8451Q
-	initMMA8451Q(	0x1C	/* i2cAddress */,	&deviceMMA8451QState	);
+	initMMA8451Q(	0x1D	/* i2cAddress */,	&deviceMMA8451QState	);
 #endif	
 
 #ifdef WARP_BUILD_ENABLE_DEVLPS25H
@@ -1339,7 +1340,7 @@ main(void)
 	 */
 #endif
 
-
+	devSSD1331init();
 
 
 	while (1)
