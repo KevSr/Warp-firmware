@@ -61,14 +61,20 @@
 *	Comment out the header file to disable devices
 */
 #ifndef WARP_FRDMKL03
-#	include "devBMX055.h"
+//#	include "devBMX055.h"
 #	include "devMMA8451Q.h"
-#	include "devHDC1000.h"
-#	include "devMAG3110.h"
-#	include "devL3GD20H.h"
-#	include "devBME680.h"
-#	include "devCCS811.h"
-#	include "devAMG8834.h"
+//#	include "devHDC1000.h"
+//#	include "devMAG3110.h"
+//#	include "devL3GD20H.h"
+//#	include "devBME680.h"
+//#	include "devCCS811.h"
+//#	include "devAMG8834.h"
+/*
+ * For Coursework 4 4B25 - Added codes to enable INA219
+ */
+#	include "devINA219.h"
+#	include "devHCSR04.h"
+#	include "devSSD1331.h"
 //#include "devTCS34725.h"
 //#include "devSI4705.h"
 //#include "devSI7021.h"
@@ -79,7 +85,7 @@
 //#include "devAS7263.h"
 //#include "devRV8803C7.h"
 #else
-#	include "devMMA8451Q.h"
+//#	include "devMMA8451Q.h"
 #endif
 
 #define WARP_BUILD_ENABLE_SEGGER_RTT_PRINTF
@@ -168,6 +174,16 @@ volatile WarpI2CDeviceState			deviceAS7263State;
 #ifdef WARP_BUILD_ENABLE_DEVRV8803C7
 volatile WarpI2CDeviceState			deviceRV8803C7State;
 #endif
+/*
+ * For Coursework 4 4B25 - Added codes to enable INA219
+ */
+#ifdef WARP_BUILD_ENABLE_DEVINA219
+volatile WarpI2CDeviceState			deviceINA219State;
+#endif
+
+#ifdef WARP_BUILD_ENABLE_DEVHCRS04
+volatile WarpGPIODeviceState		deviceHCSR04State;
+#endif
 
 /*
  *	TODO: move this and possibly others into a global structure
@@ -212,6 +228,7 @@ void					powerupAllSensors(void);
 uint8_t					readHexByte(void);
 int					read4digits(void);
 void					printAllSensors(bool printHeadersAndCalibration, bool hexModeFlag, int menuDelayBetweenEachRun, int i2cPullupValue);
+void					printOneSensor();
 
 
 /*
@@ -1292,7 +1309,12 @@ main(void)
   setRTCCountdownRV8803C7(0, TD_1HZ, false);
   disableI2Cpins();
 #endif
-
+/*
+ * For Coursework 4 4B25 - Added codes to enable INA219
+ */
+#ifdef WARP_BUILD_ENABLE_DEVINA219
+	initINA219(	0x40	/* i2cAddress */,	&deviceINA219State	);
+#endif
 	/*
 	 *	Initialization: Devices hanging off SPI
 	 */
@@ -1340,7 +1362,7 @@ main(void)
 #endif
 
 
-
+	devHCSR04init();
 
 	while (1)
 	{
@@ -1443,6 +1465,9 @@ main(void)
 #endif
 
 		SEGGER_RTT_WriteString(0, "\r- 'z': dump all sensors data.\n");
+		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
+
+		SEGGER_RTT_WriteString(0, "\r- 'w': Start ultrasensor measurment.\n");
 		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
 
 		SEGGER_RTT_WriteString(0, "\rEnter selection> ");
@@ -1721,6 +1746,18 @@ main(void)
 					{
 						menuTargetSensor = kWarpSensorAS7263;
 						menuI2cDevice = &deviceAS7263State;
+						break;
+					}
+#endif
+
+/*
+ * For Coursework 4 4B25 - Added codes to enable INA219
+ */
+#ifdef WARP_BUILD_ENABLE_DEVINA219
+					case 'l':
+					{
+						menuTargetSensor = kWarpSensorINA219;
+						menuI2cDevice = &deviceINA219State;
 						break;
 					}
 #endif
@@ -2456,8 +2493,25 @@ main(void)
 
 				break;
 			}
+			
+			/*
+			 * For Coursework 4 4B25 - Add case to do single sensor measurement
+			 */
+			case 'w':
+			{
 
 
+				SEGGER_RTT_printf(0, "\r\n\tThis section is for coursework 5 of module 4B2\n\n");
+
+
+				printOneSensor();
+
+				/*
+				 *	Not reached (printAllSensors() does not return)
+				 */
+
+				break;
+			}
 			/*
 			 *	Ignore naked returns.
 			 */
@@ -2513,6 +2567,14 @@ printAllSensors(bool printHeadersAndCalibration, bool hexModeFlag, int menuDelay
 	numberOfConfigErrors += configureSensorL3GD20H(	0b11111111,/* ODR 800Hz, Cut-off 100Hz, see table 21, normal mode, x,y,z enable */
 					0b00100000,
 					0b00000000,/* normal mode, disable FIFO, disable high pass filter */
+					i2cPullupValue
+					);
+	#endif
+	/*
+ 	* For Coursework 4 4B25 - Added codes to enable INA219 in Dump read mode
+ 	*/
+	#ifdef WARP_BUILD_ENABLE_DEVINA219
+	numberOfConfigErrors += configureSensorINA219(
 					i2cPullupValue
 					);
 	#endif
@@ -2626,6 +2688,17 @@ printAllSensors(bool printHeadersAndCalibration, bool hexModeFlag, int menuDelay
 		SEGGER_RTT_WriteString(0, " HDC1000 Temp, HDC1000 Hum,");
 		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
 		#endif
+		/*
+		 * For Coursework 4 4B25 - Added codes to enable INA219 in Dump Read Mode
+ 		*/
+		#ifdef WARP_BUILD_ENABLE_DEVINA219
+		SEGGER_RTT_WriteString(0, " INA219 Current,");
+		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
+		#endif
+		#ifdef WARP_BUILD_ENABLE_DEVHCSR04
+		SEGGER_RTT_WriteString(0, " HCSR04 Time,");
+		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
+		#endif
 		SEGGER_RTT_WriteString(0, " RTC->TSR, RTC->TPR, # Config Errors");
 		OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
 		SEGGER_RTT_WriteString(0, "\n\n");
@@ -2666,6 +2739,16 @@ printAllSensors(bool printHeadersAndCalibration, bool hexModeFlag, int menuDelay
 		printSensorDataHDC1000(hexModeFlag);
 		#endif
 	
+		/*
+		 * For Coursework 4 4B25 - Added codes to enable INA219 in Dump Read Mode
+ 		 */
+		#ifdef WARP_BUILD_ENABLE_DEVINA219
+		printSensorDataINA219(hexModeFlag, i2cPullupValue);
+		#endif
+		#ifdef WARP_BUILD_ENABLE_DEVHCSR04
+		printSensorDataHCSR04(hexModeFlag);
+		#endif
+	
 
 		#ifdef WARP_BUILD_ENABLE_SEGGER_RTT_PRINTF
 		SEGGER_RTT_printf(0, " %d, %d, %d\n", RTC->TSR, RTC->TPR, numberOfConfigErrors);
@@ -2680,6 +2763,28 @@ printAllSensors(bool printHeadersAndCalibration, bool hexModeFlag, int menuDelay
 	}
 }
 
+/*
+ * For Coursework 5 4B25 
+ */
+
+
+void
+printOneSensor()
+{
+	#ifdef WARP_BUILD_ENABLE_DEVHCSR04
+	SEGGER_RTT_WriteString(0, "Starting HCSR04 ultrasonic proximity sensor");
+	OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
+	#endif
+	SEGGER_RTT_WriteString(0, "\n\n");
+	OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
+
+
+	#ifdef WARP_BUILD_ENABLE_DEVHCSR04
+	printSensorDataHCSR04();
+	#endif
+	SEGGER_RTT_WriteString(0, "\n Program stopped");
+	OSA_TimeDelay(gWarpMenuPrintDelayMilliseconds);
+}
 
 void
 loopForSensor(	const char *  tagString,
@@ -3437,7 +3542,7 @@ writeBytesToSpi(uint8_t *  payloadBytes, int payloadLength)
 void
 powerupAllSensors(void)
 {
-	WarpStatus	status;
+//	WarpStatus	status;
 
 	/*
 	 *	BMX055mag

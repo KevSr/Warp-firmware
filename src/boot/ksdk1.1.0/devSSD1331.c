@@ -138,26 +138,70 @@ devSSD1331init(void)
 	/*
 	 *	To use fill commands, you will have to issue a command to the display to enable them. See the manual.
 	 */
+//	writeCommand(kSSD1331CommandDISPLAYALLON);	// 0xA5
 	writeCommand(kSSD1331CommandFILL);
-	writeCommand(0x01);
+        writeCommand(0x01);
 
 	/*
 	 *	Clear Screen
 	 */
+
 	writeCommand(kSSD1331CommandCLEAR);
 	writeCommand(0x00);
 	writeCommand(0x00);
 	writeCommand(0x5F);
 	writeCommand(0x3F);
 
+	return 0;
+}
 
+int devSSD1331Green(void){
 
-	/*
-	 *	Any post-initialization drawing commands go here.
-	 */
-	//...
+        writeCommand(kSSD1331CommandDRAWRECT);
+        writeCommand(0x01);
+        writeCommand(0x01);
+        writeCommand(0x5D);
+        writeCommand(0x3D);
+        writeCommand(0x00);
+        writeCommand(0xFF);
+        writeCommand(0x00);
+        writeCommand(0x00);
+        writeCommand(0xFF);
+        writeCommand(0x00);
+		
+	return 0;
+}
 
+int devSSD1331Red(void){
 
+        writeCommand(kSSD1331CommandDRAWRECT);
+        writeCommand(0x01);
+        writeCommand(0x01);
+        writeCommand(0x5D);
+        writeCommand(0x3D);
+        writeCommand(0x3E);
+        writeCommand(0x00);
+        writeCommand(0x00);
+        writeCommand(0x3E);
+        writeCommand(0x00);
+        writeCommand(0x00);
+
+	return 0;
+}
+
+int devSSD1331Yellow(void){
+
+        writeCommand(kSSD1331CommandDRAWRECT);
+        writeCommand(0x01);
+        writeCommand(0x01);
+        writeCommand(0x5D);
+        writeCommand(0x3D);
+        writeCommand(0x3E);
+        writeCommand(0xFF);
+        writeCommand(0x00);
+        writeCommand(0x3E);
+        writeCommand(0xFF);
+        writeCommand(0x00);
 
 	return 0;
 }
