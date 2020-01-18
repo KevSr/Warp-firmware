@@ -126,7 +126,7 @@ devSSD1331init(void)
 	writeCommand(kSSD1331CommandVCOMH);		// 0xBE
 	writeCommand(0x3E);
 	writeCommand(kSSD1331CommandMASTERCURRENT);	// 0x87
-	writeCommand(0x06);
+	writeCommand(0x0F);
 	writeCommand(kSSD1331CommandCONTRASTA);		// 0x81
 	writeCommand(0x91);
 	writeCommand(kSSD1331CommandCONTRASTB);		// 0x82
@@ -172,18 +172,32 @@ int devSSD1331Green(void){
 	return 0;
 }
 
+<<<<<<< HEAD
 int devSSD1331Red(void){
+=======
+	/*
+	 *	Any post-initialization drawing commands go here.
+	 */
+>>>>>>> 0bffe64185981844445830bab26d8476fb092ac3
 
         writeCommand(kSSD1331CommandDRAWRECT);
         writeCommand(0x01);
         writeCommand(0x01);
         writeCommand(0x5D);
         writeCommand(0x3D);
+<<<<<<< HEAD
         writeCommand(0x3E);
         writeCommand(0x00);
         writeCommand(0x00);
         writeCommand(0x3E);
         writeCommand(0x00);
+=======
+        writeCommand(0x00);
+        writeCommand(0xFF);
+        writeCommand(0x00);
+        writeCommand(0x00);
+        writeCommand(0xFF);
+>>>>>>> 0bffe64185981844445830bab26d8476fb092ac3
         writeCommand(0x00);
 
 	return 0;
