@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "fsl_misc_utilities.h": "c"
+    },
+    "python.linting.pycodestyleEnabled": false,
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.pythonPath": "/usr/local/bin/python3"
+}

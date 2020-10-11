@@ -129,12 +129,13 @@ void printSensorDataHCSR04()
         nondec = distance;
         decimal = distance - nondec;
         if(key == kWarpStatusOK){
-            if(distance < 50){
-                GPIO_DRV_SetPinOutput(kHCSR04PinVIBR);
+            if(distance < 30){
                 pwmstart();
+                GPIO_DRV_SetPinOutput(kHCSR04PinVIBR);
+                
 //                devSSD1331Red();
             }
-            else if(distance < 150 && distance >= 50){
+            else if(distance < 60 && distance >= 30){
                 pwmstart();
 //                devSSD1331Yellow();
             }
