@@ -15,7 +15,7 @@ The system consists of two different methods to alert the user.
    
 This system uses a *Ultrasonic proximity sensor* to detect the objects in front of the user. The system triggers piezo buzzer to ring when an object is within 1.5m. If the object comes closer than 50cm of the user, vibrating motor gets triggered as well, providing additional alert.
 
-Check [diff.patch](../diff.patch) file to see detailed changes I have made for this project. This file also includes changes in srec and hex files as well.
+Check [diff.patch](/diff.patch) file to see detailed changes I have made for this project. This file also includes changes in srec and hex files as well.
 
 ## Repository Layout
 This project uses Warp-firmware as its framework. Therefore, all project files are located in
