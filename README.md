@@ -5,7 +5,7 @@
 
 **jk680**
 
-![Sample generated image with CatGAN generator](https://github.com/KevSr/Warp-firmware/tree/master/images/trafficlight.png)
+![Sample generated image with CatGAN generator](https://github.com/KevSr/Warp-firmware/blob/master/images/trafficlight.png)
 
 ## Summary
 This project aims to develop a alert system that can possibly help people with visual disability.
